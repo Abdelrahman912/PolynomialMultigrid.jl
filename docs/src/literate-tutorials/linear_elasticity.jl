@@ -169,9 +169,10 @@ function FerriteOperators.setup_element_cache(problem::LinearElasticityIntegrato
     return LinearElasticityElementCache(cv, problem.ℂ)
 end
 
-function FerriteOperators.assemble_element!(Ke::AbstractMatrix, cell::CellCache, cache::LinearElasticityElementCache, p)
-    reinit!(cache.cv, cell)
-    fill!(Ke, 0.0)
+FerriteOperators.reinit_values!(cache::LinearElasticityElementCache, cell) = reinit!(cache.cv, cell)
+
+FerriteOperators.provides_analytic(::Type{<:LinearElasticityElementCache}, ::JacobianKind) = true
+function FerriteOperators.assemble_cell!(req::JacobianRequest{:u}, cache::LinearElasticityElementCache, args::KernelArgs)
     ℂ = cache.ℂ
     for q_point in 1:getnquadpoints(cache.cv)
         dΩ = getdetJdV(cache.cv, q_point)
@@ -179,11 +180,25 @@ function FerriteOperators.assemble_element!(Ke::AbstractMatrix, cell::CellCache,
             ∇ˢʸᵐNᵢ = shape_symmetric_gradient(cache.cv, q_point, i)
             for j in 1:getnbasefunctions(cache.cv)
                 ∇ˢʸᵐNⱼ = shape_symmetric_gradient(cache.cv, q_point, j)
-                Ke[i, j] += (∇ˢʸᵐNᵢ ⊡ ℂ ⊡ ∇ˢʸᵐNⱼ) * dΩ
+                req.K[i, j] += (∇ˢʸᵐNᵢ ⊡ ℂ ⊡ ∇ˢʸᵐNⱼ) * dΩ
             end
         end
     end
-    return Ke
+end
+
+# The bilinear form induces a linear operator, so its residual is the element
+# matrix acting on the element vector — mandatory so the element also
+# composes into nonlinear operators.
+function FerriteOperators.assemble_cell!(req::ResidualRequest, cache::LinearElasticityElementCache, args::KernelArgs)
+    ℂ = cache.ℂ
+    uₑ = args.states.u
+    for q_point in 1:getnquadpoints(cache.cv)
+        dΩ = getdetJdV(cache.cv, q_point)
+        εu = function_symmetric_gradient(cache.cv, q_point, uₑ)
+        for i in 1:getnbasefunctions(cache.cv)
+            req.r[i] += (shape_symmetric_gradient(cache.cv, q_point, i) ⊡ ℂ ⊡ εu) * dΩ
+        end
+    end
 end
 
 # ### Near Null Space (NNS)

@@ -33,7 +33,7 @@ import FerriteOperators:
     AbstractBilinearIntegrator, AbstractVolumetricElementCache,
     AbstractAssemblyStrategy,
     setup_operator, update_operator!,
-    setup_element_cache, assemble_element!,
+    setup_element_cache,
     setup_transfer_operator, setup_nested_transfer_operator,
     MassProlongatorIntegrator, NestedMassProlongatorIntegrator,
     SameGridCellIterator, NestedGridCellIterator,
