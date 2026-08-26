@@ -39,7 +39,7 @@ end
 FerriteOperators.reinit_values!(cache::DiffusionElementCache, cell) = Ferrite.reinit!(cache.cv, cell)
 
 FerriteOperators.provides_analytic(::Type{<:DiffusionElementCache}, ::JacobianKind) = true
-function FerriteOperators.assemble_cell!(req::JacobianRequest{:u}, cache::DiffusionElementCache, args::KernelArgs)
+function FerriteOperators.assemble_cell!(req::JacobianRequest{:u}, cache::DiffusionElementCache, args::CellArgs)
     K_coeff = cache.K
     for q in 1:getnquadpoints(cache.cv)
         dΩ = getdetJdV(cache.cv, q)
@@ -56,7 +56,7 @@ end
 # The bilinear form induces a linear operator, so its residual is the element
 # matrix acting on the element vector — mandatory so the element composes
 # into nonlinear operators and AD.
-function FerriteOperators.assemble_cell!(req::ResidualRequest, cache::DiffusionElementCache, args::KernelArgs)
+function FerriteOperators.assemble_cell!(req::ResidualRequest, cache::DiffusionElementCache, args::CellArgs)
     K_coeff = cache.K
     uₑ = args.states.u
     for q in 1:getnquadpoints(cache.cv)

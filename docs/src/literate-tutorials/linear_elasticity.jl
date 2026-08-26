@@ -172,7 +172,7 @@ end
 FerriteOperators.reinit_values!(cache::LinearElasticityElementCache, cell) = reinit!(cache.cv, cell)
 
 FerriteOperators.provides_analytic(::Type{<:LinearElasticityElementCache}, ::JacobianKind) = true
-function FerriteOperators.assemble_cell!(req::JacobianRequest{:u}, cache::LinearElasticityElementCache, args::KernelArgs)
+function FerriteOperators.assemble_cell!(req::JacobianRequest{:u}, cache::LinearElasticityElementCache, args::CellArgs)
     ℂ = cache.ℂ
     for q_point in 1:getnquadpoints(cache.cv)
         dΩ = getdetJdV(cache.cv, q_point)
@@ -189,7 +189,7 @@ end
 # The bilinear form induces a linear operator, so its residual is the element
 # matrix acting on the element vector — mandatory so the element also
 # composes into nonlinear operators.
-function FerriteOperators.assemble_cell!(req::ResidualRequest, cache::LinearElasticityElementCache, args::KernelArgs)
+function FerriteOperators.assemble_cell!(req::ResidualRequest, cache::LinearElasticityElementCache, args::CellArgs)
     ℂ = cache.ℂ
     uₑ = args.states.u
     for q_point in 1:getnquadpoints(cache.cv)
