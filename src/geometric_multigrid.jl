@@ -96,10 +96,10 @@ gmultigrid_config(; coarse_strategy = Galerkin()) = GMultigridConfiguration(coar
 Integrator for assembling a prolongation operator between a fine and a coarse grid
 that are **hierarchically nested** (geometric multigrid).
 
-Unlike [`NestedMassProlongatorIntegrator`](@ref), this variant avoids the local mass
-matrix and Cholesky solve entirely.  The coarse basis functions are evaluated directly
-at the fine element's Lagrange node positions, which are first mapped to the coarse
-reference frame using the same affine map as `NestedMassProlongatorIntegrator`:
+The nested-grid analogue of `PolynomialProlongationIntegrator`: it avoids a local
+mass matrix and Cholesky solve entirely, evaluating the coarse basis functions
+directly at the fine element's Lagrange node positions, which are first mapped to the
+coarse reference frame:
 
 ```math
 \xi_\text{coarse} = \sum_k N_k^{\text{geo,fine}}(\hat\xi_i)\;\hat{x}_k
@@ -202,9 +202,9 @@ Assemble the prolongation matrix P for a geometric level transition using
 
 The prolongation is computed by direct nodal interpolation: for each fine Lagrange
 node, the coarse basis functions are evaluated at the corresponding coarse reference
-coordinate (obtained by mapping through `child_ref_coords`).  This avoids the local
-mass-matrix solve of `NestedMassProlongatorIntegrator` and is well-posed for all
-supported element types including Wedge.
+coordinate (obtained by mapping through `child_ref_coords`).  Unlike a mass-matrix
+based projection this needs no local solve, and is well-posed for all supported
+element types including Wedge.
 """
 function build_geometric_prolongator(
         dh_fine::DofHandler,

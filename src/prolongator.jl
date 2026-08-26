@@ -51,9 +51,9 @@ end
 
 Assemble the prolongation matrix P of size `(ndofs(fine_dh) × ndofs(coarse_dh))`.
 
-Uses a `MassProlongatorIntegrator` via the FerriteOperators transfer operator infrastructure.
-For each cell the local prolongator is computed via an element-local L²-projection
-(fine mass matrix inverse times cross-mass matrix), then assembled into the global matrix.
+Uses a `PolynomialProlongationIntegrator` via the FerriteOperators transfer operator
+infrastructure: for each cell, the coarse basis functions are evaluated directly at the
+fine element's Lagrange node positions (pure nodal interpolation, no mass matrix).
 Rows are normalised by the number of element contributions to handle shared dofs correctly.
 """
 function build_prolongator(
@@ -63,7 +63,6 @@ function build_prolongator(
     field_name  = first(Ferrite.getfieldnames(fine_dh))
     # FIXME multi-field support
     @assert length(fine_dh.field_names) == 1 "Multiple fields not yet supported"
-    qr_order    = 2 * getorder(fine_dh.subdofhandlers[1].field_interpolations[1])
     integrator  = PolynomialProlongationIntegrator(field_name)
     strategy    = SequentialAssemblyStrategy(SequentialCPUDevice())
 

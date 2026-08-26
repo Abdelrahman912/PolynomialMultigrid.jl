@@ -10,7 +10,7 @@ import Base: *
 using TimerOutputs
 
 using Ferrite
-import Ferrite: getorder, AbstractDofHandler, reinit!, AbstractCell, AbstractRefShape, AbstractGrid
+import Ferrite: AbstractDofHandler, reinit!, AbstractCell, AbstractRefShape, AbstractGrid
 @reexport using AlgebraicMultigrid
 import AlgebraicMultigrid as AMG
 import AlgebraicMultigrid:
@@ -30,15 +30,12 @@ import AlgebraicMultigrid:
 
 using FerriteOperators
 import FerriteOperators:
-    AbstractBilinearIntegrator, AbstractVolumetricElementCache,
+    AbstractBilinearIntegrator,
     AbstractAssemblyStrategy,
     setup_operator, update_operator!,
-    setup_element_cache,
     setup_transfer_operator, setup_nested_transfer_operator,
-    MassProlongatorIntegrator, NestedMassProlongatorIntegrator,
     SameGridCellIterator, NestedGridCellIterator,
-    getrowdofs, getcolumndofs,
-    QuadratureRuleCollection, getquadraturerule,
+    getrowdofs,
     SequentialAssemblyStrategy, SequentialCPUDevice
 import Ferrite: get_grid
 
